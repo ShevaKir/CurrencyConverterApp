@@ -13,3 +13,8 @@ export const selectUserCurrency = createSelector(
   selectCurrencyState,
   (state) => state.userCurrency
 );
+
+export const selectSupportedCurrencyCodes = createSelector(
+  selectCurrencyState,
+  (state) => state.supportedCurrencyCodes
+);

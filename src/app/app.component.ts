@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './components/header/header.component';
 import { Store } from '@ngrx/store';
-import { loadUserCurrency } from './store/actions';
+import { loadSupportedCurrencyCodes, loadUserCurrency } from './store/actions';
 
 @Component({
   selector: 'app-root',
@@ -16,5 +16,6 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.store.dispatch(loadUserCurrency());
+    this.store.dispatch(loadSupportedCurrencyCodes());
   }
 }

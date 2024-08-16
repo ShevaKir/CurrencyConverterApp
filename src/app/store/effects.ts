@@ -48,4 +48,22 @@ export class CurrencyEffects {
       })
     )
   );
+
+  loadSupportedCurrencyCodes$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(CurrencyActions.loadSupportedCurrencyCodes),
+      switchMap((props) => {
+        return this.currencyService.getSupportedCurrencies().pipe(
+          map((supportedCodes) =>
+            CurrencyActions.loadSupportedCurrencyCodesSuccess({
+              supportedCurrencyCodes: supportedCodes,
+            })
+          ),
+          catchError((error) =>
+            of(CurrencyActions.loadSupportedCurrencyCodesFailure({ error }))
+          )
+        );
+      })
+    )
+  );
 }
