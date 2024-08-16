@@ -1,3 +1,18 @@
-<mat-toolbar>
+<mat-toolbar class="toolbar">
   <span>Currency Converter</span>
+  <span class="toolbar__spacer"></span>
+
+  <mat-form-field class="toolbar__currency-select" >
+    <mat-label>Currency</mat-label>
+    <mat-select [(value)]="defaultCurrency" (selectionChange)="onChangePopularCurrency($event)">
+      <mat-option value="USD">USD</mat-option>
+      <mat-option value="EUR">EUR</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  @if(selectedCurrentRate$ | async; as currentRate) {
+  <span>
+    {{ currentRate?.conversion_rate }} {{ currentRate?.target_code }}
+  </span>
+  }
 </mat-toolbar>

@@ -1,0 +1,10 @@
+.toolbar {
+  align-items: baseline;
+  &__spacer {
+    flex: 1 1 auto;
+  }
+  &__currency-select {
+    width: 110px;
+  }
+}
+
