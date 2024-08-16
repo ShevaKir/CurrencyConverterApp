@@ -1,3 +1,12 @@
 <mat-toolbar>
   <span>Currency Converter</span>
+  <span class="spacer"></span>
+
+  @if(selectedCurrentRate$ | async; as currentRate) {
+  <span>
+    1 {{ currentRate?.base_code }} is equal to
+    {{ currentRate?.conversion_rate }}
+    {{ currentRate?.target_code }}
+  </span>
+  }
 </mat-toolbar>
