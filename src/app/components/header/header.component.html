@@ -4,7 +4,7 @@
 
   <mat-form-field class="toolbar__currency-select" >
     <mat-label>Currency</mat-label>
-    <mat-select [(value)]="defaultCurrency" (selectionChange)="onChangePopularCurrency($event)">
+    <mat-select [(value)]="defaultBaseCurrency" (selectionChange)="onChangePopularCurrency($event)">
       <mat-option value="USD">USD</mat-option>
       <mat-option value="EUR">EUR</mat-option>
     </mat-select>
