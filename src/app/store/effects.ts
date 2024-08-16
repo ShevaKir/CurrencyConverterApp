@@ -11,7 +11,7 @@ export class CurrencyEffects {
     private actions$: Actions
   ) {}
 
-  loadMovies$ = createEffect(() =>
+  loadCurrentRate$ = createEffect(() =>
     this.actions$.pipe(
       ofType(CurrencyActions.loadCurrentRate),
       switchMap((props) => {
