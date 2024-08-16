@@ -8,3 +8,8 @@ export const selectCurrentRate = createSelector(
   selectCurrencyState,
   (state) => state.currentRate
 );
+
+export const selectUserCurrency = createSelector(
+  selectCurrencyState,
+  (state) => state.userCurrency
+);
