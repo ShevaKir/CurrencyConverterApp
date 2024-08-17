@@ -14,10 +14,13 @@ export class CurrencyService {
 
   getCurrentRate(
     base: string,
-    target: string
+    target: string,
+    amount: number = 1
   ): Observable<ExchangeRateResponse> {
     return this.http.get<ExchangeRateResponse>(
-      `${this._apiPath}/pair/${base.toUpperCase()}/${target.toUpperCase()}`
+      `${
+        this._apiPath
+      }/pair/${base.toUpperCase()}/${target.toUpperCase()}/${amount}`
     );
   }
 
