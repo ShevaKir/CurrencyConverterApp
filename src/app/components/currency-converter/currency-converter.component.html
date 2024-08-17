@@ -13,6 +13,7 @@
     <app-input-currency
       [currencyAmount]="selectedTargerCurrencyAmount$ | async"
       [supportedCurrencies]="selectedSupportedCurrency$ | async"
+      (selectedCurrencyAmount)="handleTargetCurrencyAmount($event)"
     ></app-input-currency>
   </mat-card-content>
   <mat-card-footer class="converter__footer"> Result</mat-card-footer>

@@ -14,7 +14,7 @@ export const selectBaseConversionResult = createSelector(
   selectCurrencyState,
   (state) => {
     const base: CurrencyAmount = {
-      amount: 10,
+      amount: state.conversionResult.amount,
       currency: state.conversionResult.base_code,
     };
     return base;

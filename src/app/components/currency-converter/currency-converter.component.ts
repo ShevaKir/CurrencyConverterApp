@@ -31,6 +31,9 @@ export class CurrencyConverterComponent {
     selectSupportedCurrencyCodes
   );
 
+  private baseCurrencyAmount!: CurrencyAmount;
+  private targetCurrencyAmount!: CurrencyAmount;
+
   constructor(private store: Store) {
     this.store.dispatch(
       loadConversionResult({
@@ -42,13 +45,26 @@ export class CurrencyConverterComponent {
   }
 
   handleBaseCurrencyAmount(event: CurrencyAmount) {
-    if (event.amount !== null)
+    this.baseCurrencyAmount = event;
+    this.tryDispatchConversion();
+  }
+
+  handleTargetCurrencyAmount(event: CurrencyAmount) {
+    this.targetCurrencyAmount = event;
+    // this.store.dispatch(reverseConversion({ targetAmount: event.amount }));
+    this.tryDispatchConversion();
+  }
+
+  private tryDispatchConversion(): void {
+    console.log(this.baseCurrencyAmount, this.targetCurrencyAmount);
+    if (this.baseCurrencyAmount && this.targetCurrencyAmount) {
       this.store.dispatch(
         loadConversionResult({
-          base: event.currency,
-          target: 'UAH',
-          amount: event.amount,
+          base: this.baseCurrencyAmount.currency,
+          target: this.targetCurrencyAmount.currency,
+          amount: this.baseCurrencyAmount.amount,
         })
       );
+    }
   }
 }
