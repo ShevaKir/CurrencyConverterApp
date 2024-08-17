@@ -1,7 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
 import { initialState } from './state';
 import * as CurrencyActions from './actions';
-import { environment } from '../environments/environment';
 
 export const CurrencyReducer = createReducer(
   initialState,

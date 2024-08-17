@@ -11,5 +11,5 @@ export interface CurrencyState {
 export const initialState: CurrencyState = {
   currentRate: null,
   userCurrency: null,
-  supportedCurrencyCodes: null,
+  supportedCurrencyCodes: null
 };

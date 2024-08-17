@@ -5,11 +5,11 @@
   <mat-card-content>
     <p>Base:</p>
     <app-input-currency
-      [supportedCurrencies]="supportedCurrency$ | async"
+      [supportedCurrencies]="selectedSupportedCurrency$ | async"
     ></app-input-currency>
     <p>Target:</p>
     <app-input-currency
-      [supportedCurrencies]="supportedCurrency$ | async"
+      [supportedCurrencies]="selectedSupportedCurrency$ | async"
     ></app-input-currency>
   </mat-card-content>
   <mat-card-footer class="converter__footer"> Result</mat-card-footer>
