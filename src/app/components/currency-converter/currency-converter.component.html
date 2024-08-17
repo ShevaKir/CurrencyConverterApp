@@ -1,0 +1,16 @@
+<mat-card class="converter" appearance="outlined">
+  <mat-card-header
+    ><mat-card-title>Currency converter</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <p>Base:</p>
+    <app-input-currency
+      [supportedCurrencies]="supportedCurrency$ | async"
+    ></app-input-currency>
+    <p>Target:</p>
+    <app-input-currency
+      [supportedCurrencies]="supportedCurrency$ | async"
+    ></app-input-currency>
+  </mat-card-content>
+  <mat-card-footer class="converter__footer"> Result</mat-card-footer>
+</mat-card>
