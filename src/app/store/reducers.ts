@@ -17,6 +17,21 @@ export const CurrencyReducer = createReducer(
       error: error,
     };
   }),
+  on(
+    CurrencyActions.loadConversionResultSuccess,
+    (state, { conversionResult }) => {
+      return {
+        ...state,
+        conversionResult: conversionResult,
+      };
+    }
+  ),
+  on(CurrencyActions.loadConversionResultFailure, (state, { error }) => {
+    return {
+      ...state,
+      error: error,
+    };
+  }),
   on(CurrencyActions.loadUserCurrencySuccess, (state, { userCurrency }) => {
     return {
       ...state,

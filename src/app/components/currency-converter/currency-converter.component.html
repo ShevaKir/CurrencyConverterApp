@@ -5,10 +5,13 @@
   <mat-card-content>
     <p>Base:</p>
     <app-input-currency
+      [currencyAmount]="selectedBaseCurrencyAmount$ | async"
       [supportedCurrencies]="selectedSupportedCurrency$ | async"
+      (selectedCurrencyAmount)="handleBaseCurrencyAmount($event)"
     ></app-input-currency>
     <p>Target:</p>
     <app-input-currency
+      [currencyAmount]="selectedTargerCurrencyAmount$ | async"
       [supportedCurrencies]="selectedSupportedCurrency$ | async"
     ></app-input-currency>
   </mat-card-content>
