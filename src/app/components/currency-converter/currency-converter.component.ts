@@ -8,7 +8,7 @@ import {
   selectTargetConversionResult,
 } from '../../store/selectors';
 import { AsyncPipe } from '@angular/common';
-import { loadConversionResult } from '../../store/actions';
+import { loadConversionResult, updateBaseAmount } from '../../store/actions';
 import { CurrencyAmount } from '../../models/currency-amount.model';
 import { environment } from '../../environments/environment';
 
@@ -20,6 +20,7 @@ import { environment } from '../../environments/environment';
   styleUrl: './currency-converter.component.scss',
 })
 export class CurrencyConverterComponent {
+  public baseAmount: number = 0;
   public selectedBaseCurrencyAmount$ = this.store.select(
     selectBaseConversionResult
   );
@@ -44,20 +45,43 @@ export class CurrencyConverterComponent {
     );
   }
 
-  handleBaseCurrencyAmount(event: CurrencyAmount) {
-    this.baseCurrencyAmount = event;
-    this.tryDispatchConversion();
+  handleBaseAmount(amount: number) {
+    this.baseCurrencyAmount = {
+      ...this.baseCurrencyAmount,
+      amount,
+    };
   }
 
-  handleTargetCurrencyAmount(event: CurrencyAmount) {
-    this.targetCurrencyAmount = event;
-    // this.store.dispatch(reverseConversion({ targetAmount: event.amount }));
-    this.tryDispatchConversion();
+  handleBaseCurrency(currency: string) {
+    debugger;
+    this.baseCurrencyAmount = {
+      ...this.baseCurrencyAmount,
+      currency,
+    };
+    this.dispatchConversion();
   }
 
-  private tryDispatchConversion(): void {
-    console.log(this.baseCurrencyAmount, this.targetCurrencyAmount);
-    if (this.baseCurrencyAmount && this.targetCurrencyAmount) {
+  handleTargetAmount(amount: number) {
+    this.targetCurrencyAmount = {
+      ...this.targetCurrencyAmount,
+      amount,
+    };
+  }
+
+  handleTargetCurrency(currency: string) {
+    this.targetCurrencyAmount = {
+      ...this.targetCurrencyAmount,
+      currency,
+    };
+    this.dispatchConversion();
+  }
+
+  private dispatchConversion(): void {
+    if (
+      this.baseCurrencyAmount?.amount &&
+      this.baseCurrencyAmount?.currency &&
+      this.targetCurrencyAmount?.currency
+    ) {
       this.store.dispatch(
         loadConversionResult({
           base: this.baseCurrencyAmount.currency,

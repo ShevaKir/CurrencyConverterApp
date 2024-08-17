@@ -19,7 +19,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { CurrencyCode } from '../../models/currency-code.model';
-import { Subscription, distinctUntilChanged } from 'rxjs';
+import { Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
 import { CurrencyAmount } from '../../models/currency-amount.model';
 
 @Component({
@@ -41,7 +41,8 @@ export class InputCurrencyComponent implements OnInit, OnDestroy, OnChanges {
     currency: 'USD',
   };
   @Input() supportedCurrencies: CurrencyCode[] | null = [];
-  @Output() selectedCurrencyAmount = new EventEmitter<CurrencyAmount>();
+  @Output() selectedAmount = new EventEmitter<number>();
+  @Output() selectedCurrency = new EventEmitter<string>();
 
   private subscriptions: Subscription = new Subscription();
   form: FormGroup;
@@ -54,19 +55,24 @@ export class InputCurrencyComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit(): void {
-    const valueChangesSub = this.form.valueChanges
-      .pipe(distinctUntilChanged())
+    const amountChangesSub = this.form.controls['amountInput'].valueChanges
+      .pipe(distinctUntilChanged(), debounceTime(300))
       .subscribe((value) => {
-        if (this.form.valid) {
-          const selectedCurrencyAmount: CurrencyAmount = {
-            amount: this.form.controls['amountInput'].value,
-            currency: this.form.controls['currencySelect'].value,
-          };
-          this.onChange(selectedCurrencyAmount);
+        if (this.form.controls['amountInput'].valid) {
+          this.onChangeAmount(value);
         }
       });
 
-    this.subscriptions.add(valueChangesSub);
+    const currencyChangesSub = this.form.controls['currencySelect'].valueChanges
+      .pipe(distinctUntilChanged(), debounceTime(300))
+      .subscribe((value) => {
+        if (this.form.controls['currencySelect'].valid) {
+          this.onChangeCurrency(value);
+        }
+      });
+
+    this.subscriptions.add(amountChangesSub);
+    this.subscriptions.add(currencyChangesSub);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -86,8 +92,12 @@ export class InputCurrencyComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  onChange(currencyAmount: CurrencyAmount) {
-    this.selectedCurrencyAmount.emit(currencyAmount);
+  onChangeAmount(amount: number) {
+    this.selectedAmount.emit(amount);
+  }
+
+  onChangeCurrency(currency: string) {
+    this.selectedCurrency.emit(currency);
   }
 
   ngOnDestroy(): void {
