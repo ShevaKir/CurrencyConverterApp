@@ -1,6 +1,5 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { CurrencyState } from './state';
-import { CurrencyAmount } from '../models/currency-amount.model';
 
 export const selectCurrencyState =
   createFeatureSelector<CurrencyState>('currencyState');
@@ -9,26 +8,17 @@ export const selectCurrentRate = createSelector(
   selectCurrencyState,
   (state) => state.currentRate
 );
-
-export const selectBaseConversionResult = createSelector(
+export const selectConversionResult = createSelector(
   selectCurrencyState,
   (state) => {
-    const base: CurrencyAmount = {
-      amount: state.conversionResult.amount,
-      currency: state.conversionResult.base_code,
-    };
-    return base;
+    return state.conversionResult;
   }
 );
 
-export const selectTargetConversionResult = createSelector(
+export const selectConversionRate = createSelector(
   selectCurrencyState,
   (state) => {
-    const target: CurrencyAmount = {
-      amount: state.conversionResult.conversion_result,
-      currency: state.conversionResult.target_code,
-    };
-    return target;
+    return state.conversionResult.conversion_rate;
   }
 );
 

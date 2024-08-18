@@ -1,41 +1,62 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { InputCurrencyComponent } from '../input-currency/input-currency.component';
 import { Store } from '@ngrx/store';
 import {
-  selectBaseConversionResult,
+  selectConversionResult,
   selectSupportedCurrencyCodes,
-  selectTargetConversionResult,
 } from '../../store/selectors';
 import { AsyncPipe } from '@angular/common';
-import { loadConversionResult, updateBaseAmount } from '../../store/actions';
-import { CurrencyAmount } from '../../models/currency-amount.model';
+import { loadConversionResult } from '../../store/actions';
 import { environment } from '../../environments/environment';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
+import { ConversionResult } from '../../models/conversion-result';
 
 @Component({
   selector: 'app-currency-converter',
   standalone: true,
-  imports: [MatCardModule, InputCurrencyComponent, AsyncPipe],
+  imports: [
+    ReactiveFormsModule,
+    FormsModule,
+    MatCardModule,
+    InputCurrencyComponent,
+    AsyncPipe,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+  ],
   templateUrl: './currency-converter.component.html',
   styleUrl: './currency-converter.component.scss',
 })
-export class CurrencyConverterComponent {
-  public baseAmount: number = 0;
-  public selectedBaseCurrencyAmount$ = this.store.select(
-    selectBaseConversionResult
-  );
-  public selectedTargerCurrencyAmount$ = this.store.select(
-    selectTargetConversionResult
-  );
+export class CurrencyConverterComponent implements OnInit, OnDestroy {
+  public form: FormGroup;
+  private conversionResult: ConversionResult | undefined;
 
+  public selectedConversionResult$ = this.store.select(selectConversionResult);
   public selectedSupportedCurrency$ = this.store.select(
     selectSupportedCurrencyCodes
   );
 
-  private baseCurrencyAmount!: CurrencyAmount;
-  private targetCurrencyAmount!: CurrencyAmount;
+  private subscriptions: Subscription = new Subscription();
 
   constructor(private store: Store) {
+    this.form = new FormGroup({
+      amountBase: new FormControl(null, [Validators.min(0)]),
+      currencyBase: new FormControl(null),
+      amountTarget: new FormControl(null, [Validators.min(0)]),
+      currencyTarget: new FormControl(null),
+    });
+
     this.store.dispatch(
       loadConversionResult({
         base: environment.defaultBaseCurrency,
@@ -43,52 +64,104 @@ export class CurrencyConverterComponent {
         amount: 10,
       })
     );
+
+    this.selectedConversionResult$.subscribe((result) => {
+      this.conversionResult = result;
+    });
   }
 
-  handleBaseAmount(amount: number) {
-    this.baseCurrencyAmount = {
-      ...this.baseCurrencyAmount,
-      amount,
-    };
-  }
+  ngOnInit(): void {
+    const selectedConversionResultSub =
+      this.selectedConversionResult$.subscribe((result) => {
+        if (result) {
+          this.conversionResult = result;
 
-  handleBaseCurrency(currency: string) {
-    debugger;
-    this.baseCurrencyAmount = {
-      ...this.baseCurrencyAmount,
-      currency,
-    };
-    this.dispatchConversion();
-  }
+          this.form.patchValue({
+            amountBase: parseFloat(this.conversionResult.amount.toFixed(2)),
+            currencyBase: this.conversionResult.base_code,
 
-  handleTargetAmount(amount: number) {
-    this.targetCurrencyAmount = {
-      ...this.targetCurrencyAmount,
-      amount,
-    };
-  }
+            currencyTarget: this.conversionResult.target_code,
+          });
 
-  handleTargetCurrency(currency: string) {
-    this.targetCurrencyAmount = {
-      ...this.targetCurrencyAmount,
-      currency,
-    };
-    this.dispatchConversion();
+          this.form.patchValue(
+            {
+              amountTarget: parseFloat(
+                this.conversionResult.conversion_result.toFixed(2)
+              ),
+            },
+            { emitEvent: false }
+          );
+        }
+      });
+
+    const amountBaseChangesSub = this.form.controls['amountBase'].valueChanges
+      .pipe(distinctUntilChanged(), debounceTime(300))
+      .subscribe((value) => {
+        if (this.form.controls['amountBase'].valid) {
+          this.dispatchConversion();
+        }
+      });
+
+    const currencyBaseChangesSub = this.form.controls[
+      'currencyBase'
+    ].valueChanges
+      .pipe(distinctUntilChanged(), debounceTime(300))
+      .subscribe((value) => {
+        if (this.form.controls['currencyBase'].valid) {
+          this.dispatchConversion();
+        }
+      });
+
+    const amountTargetChangesSub = this.form.controls[
+      'amountTarget'
+    ].valueChanges
+      .pipe(distinctUntilChanged(), debounceTime(300))
+      .subscribe((value) => {
+        if (
+          this.form.controls['amountTarget'].valid &&
+          this.conversionResult?.conversion_rate
+        ) {
+          this.form.patchValue(
+            {
+              amountBase: parseFloat(
+                (value / this.conversionResult.conversion_rate).toFixed(2)
+              ),
+            },
+            { emitEvent: false }
+          );
+        }
+      });
+
+    const currencyTargetChangesSub = this.form.controls[
+      'currencyTarget'
+    ].valueChanges
+      .pipe(distinctUntilChanged(), debounceTime(300))
+      .subscribe((value) => {
+        if (this.form.controls['currencyTarget'].valid) {
+          this.dispatchConversion();
+        }
+      });
+
+    this.subscriptions.add(amountBaseChangesSub);
+    this.subscriptions.add(currencyBaseChangesSub);
+    this.subscriptions.add(amountTargetChangesSub);
+    this.subscriptions.add(currencyTargetChangesSub);
+    this.subscriptions.add(selectedConversionResultSub);
   }
 
   private dispatchConversion(): void {
-    if (
-      this.baseCurrencyAmount?.amount &&
-      this.baseCurrencyAmount?.currency &&
-      this.targetCurrencyAmount?.currency
-    ) {
+    if (this.conversionResult) {
       this.store.dispatch(
         loadConversionResult({
-          base: this.baseCurrencyAmount.currency,
-          target: this.targetCurrencyAmount.currency,
-          amount: this.baseCurrencyAmount.amount,
+          base: this.form.controls['currencyBase'].value,
+          target: this.form.controls['currencyTarget'].value,
+          amount: this.form.controls['amountBase'].value,
         })
       );
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }
