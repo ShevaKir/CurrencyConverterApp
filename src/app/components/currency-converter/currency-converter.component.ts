@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
-import { InputCurrencyComponent } from '../input-currency/input-currency.component';
 import { Store } from '@ngrx/store';
 import {
   selectConversionResult,
@@ -29,7 +28,6 @@ import { ConversionResult } from '../../models/conversion-result';
     ReactiveFormsModule,
     FormsModule,
     MatCardModule,
-    InputCurrencyComponent,
     AsyncPipe,
     MatFormFieldModule,
     MatInputModule,
