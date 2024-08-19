@@ -12,7 +12,7 @@
 
   @if(selectedCurrentRate$ | async; as currentRate) {
   <span>
-    {{ currentRate?.conversion_rate }} {{ currentRate?.target_code }}
+    {{ currentRate?.conversion_rate | number:'1.2-2'}} {{ currentRate?.target_code }}
   </span>
   }
 </mat-toolbar>

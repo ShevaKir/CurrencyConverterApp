@@ -31,6 +31,26 @@ export class CurrencyEffects {
     )
   );
 
+  loadConversionResult$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(CurrencyActions.loadConversionResult),
+      switchMap((props) => {
+        return this.currencyService
+          .getCurrentRate(props.base, props.target, props.amount)
+          .pipe(
+            map((conversion) =>
+              CurrencyActions.loadConversionResultSuccess({
+                conversionResult: { ...conversion, amount: props.amount },
+              })
+            ),
+            catchError((error) =>
+              of(CurrencyActions.loadConversionResultFailure({ error }))
+            )
+          );
+      })
+    )
+  );
+
   loadUserCurrency$ = createEffect(() =>
     this.actions$.pipe(
       ofType(CurrencyActions.loadUserCurrency),
@@ -43,6 +63,24 @@ export class CurrencyEffects {
           ),
           catchError((error) =>
             of(CurrencyActions.loadUserCurrencyFailure({ error }))
+          )
+        );
+      })
+    )
+  );
+
+  loadSupportedCurrencyCodes$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(CurrencyActions.loadSupportedCurrencyCodes),
+      switchMap((props) => {
+        return this.currencyService.getSupportedCurrencies().pipe(
+          map((supportedCodes) =>
+            CurrencyActions.loadSupportedCurrencyCodesSuccess({
+              supportedCurrencyCodes: supportedCodes,
+            })
+          ),
+          catchError((error) =>
+            of(CurrencyActions.loadSupportedCurrencyCodesFailure({ error }))
           )
         );
       })

@@ -3,7 +3,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { Store } from '@ngrx/store';
 import { loadCurrentRate } from '../../store/actions';
 import { selectCurrentRate, selectUserCurrency } from '../../store/selectors';
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, DecimalPipe } from '@angular/common';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { Observable } from 'rxjs';
@@ -13,7 +13,7 @@ import { environment } from '../../environments/environment';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [MatToolbarModule, AsyncPipe, MatSelectModule, MatFormFieldModule],
+  imports: [MatToolbarModule, AsyncPipe, MatSelectModule, MatFormFieldModule, DecimalPipe],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })
